@@ -39,7 +39,14 @@ public:
     bool isBright() const { return toneParam->load() > 0.5f; }
     bool isBypassed() const { return bypassParam->get(); }
     bool isUnlocked() const { return unlockedCache.load(); }
-    eup::Mapping mapping() const { return eup::Mapping::forAmount (amount01(), isBright()); }
+    eup::Trims trims() const
+    {
+        eup::Trims t;
+        t.width = trimParams[0]->load() * 0.01f; t.reverb = trimParams[1]->load() * 0.01f;
+        t.drive = trimParams[2]->load() * 0.01f; t.ott = trimParams[3]->load() * 0.01f;
+        return t;
+    }
+    eup::Mapping mapping (float amount) const { return eup::Mapping::forAmount (amount, isBright(), trims()); }
 
     /** Output level (0..1, peak with decay) so Ephy's orb can pulse with the audio. */
     std::atomic<float> outputLevel { 0.0f };
@@ -49,6 +56,7 @@ private:
     std::atomic<float>* amountParam = nullptr;
     std::atomic<float>* toneParam = nullptr;
     juce::AudioParameterBool* bypassParam = nullptr;
+    std::atomic<float>* trimParams[4] {};
     std::atomic<bool> unlockedCache { true };
     int licenseTick = 0;
     std::vector<float> monoScratch;

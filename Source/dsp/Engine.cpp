@@ -37,7 +37,20 @@ void rbj (Biquad& q, double b0, double b1, double b2, double a0, double a1, doub
 }
 
 // ------------------------------------------------------------------ mapping
-Mapping Mapping::forAmount (float k, bool bright)
+namespace
+{
+/** Level correction when the Spellbook moves width, drive or OTT away from the default spell
+    (measured on the supersaw lead in tests/PluginCheck.cpp; reverb needs none). */
+float trimCorrectionDb (float k, float tw, float drive0, float drive1, float ott0, float ott1)
+{
+    const float dW = tw - 1.0f, dD = drive1 - drive0, dO = ott1 - ott0;
+    const float widthPresence = k < 0.3f ? k / 0.3f : 1.0f;
+    return -widthPresence * (dW < 0 ? 1.5f : 2.0f) * dW
+           + (dD < 0 ? 0.125f : 0.31f) * dD
+           + (dO < 0 ? 5.3f : 6.9f) * dO;
+}
+}
+Mapping Mapping::forAmount (float k, bool bright, const Trims& t)
 {
     Mapping m;
     m.width      = lerp ({ { 0.0f, 100.0f }, { 0.3f, 130.0f }, { 0.7f, 140.0f }, { 1.0f, 150.0f } }, k);
@@ -54,6 +67,18 @@ Mapping Mapping::forAmount (float k, bool bright)
     m.autoGainDb = bright ? lerp ({ { 0.0f, 0.0f }, { 0.15f, -0.15f }, { 0.3f, -0.75f }, { 0.5f, -0.8f }, { 0.7f, -0.85f }, { 0.85f, 0.25f }, { 1.0f, 1.3f } }, k)
                           : lerp ({ { 0.0f, 0.0f }, { 0.15f, 0.2f }, { 0.3f, -0.3f }, { 0.5f, -0.2f }, { 0.7f, 0.0f }, { 0.85f, 1.2f }, { 1.0f, 2.3f } }, k);
     m.dampingHz  = bright ? 12000.0f : 5000.0f;
+
+    // Spellbook trims (1 = default). Auto gain is calibrated for the default spell; the trims add a rough correction.
+    const auto clampT = [] (float v) { return v < 0.0f ? 0.0f : (v > 2.0f ? 2.0f : v); };
+    const float tw = clampT (t.width), tr = clampT (t.reverb), td = clampT (t.drive), to = clampT (t.ott);
+    const float baseVerb = m.reverbMix;
+    const float baseDrive = m.driveDb, baseOtt = m.ottDepth;
+    m.width = 100.0f + (m.width - 100.0f) * tw;
+    m.chorusMix *= tw;
+    m.reverbMix = std::min (0.8f, baseVerb * tr);
+    m.driveDb = baseDrive * td;
+    m.ottDepth = std::min (0.8f, baseOtt * to);
+    m.autoGainDb += trimCorrectionDb (k, tw, baseDrive, m.driveDb, baseOtt, m.ottDepth);
     return m;
 }
 
@@ -134,7 +159,7 @@ void Engine::setTempo (double b, double ppq, bool playing)
 
 void Engine::updateMapping()
 {
-    now = Mapping::forAmount (amount, bright);
+    now = Mapping::forAmount (amount, bright, trims);
     if (std::abs (now.shelfDb - lastShelf) > 0.02f) { shelf.setHighShelf (sr, 10000.0, now.shelfDb); lastShelf = now.shelfDb; }
     if (now.dampingHz != lastDamping)
     {

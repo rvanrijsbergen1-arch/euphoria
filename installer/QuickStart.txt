@@ -16,6 +16,10 @@ DARK / BRIGHT
    BRIGHT  fresh and open (default)
    DARK    warmer and softer: darker reverb, less sparkle, warmer saturation
 
+SPELLBOOK (second tab)
+   Want it your way? Width, Reverb, Drive and OTT each go from 0 to 200 % of what the knob does.
+   100 % = Ephy's default spell. Double-click a slider to reset it, or press RESET SPELLBOOK.
+
 ALWAYS ON
    - Everything below 150 Hz stays mono, so your low end stays tight however wide you go.
    - Auto gain keeps the level about the same, so BYPASS is a fair comparison: better, not just louder.

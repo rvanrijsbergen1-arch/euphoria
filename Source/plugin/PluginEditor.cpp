@@ -263,11 +263,47 @@ EuphoriaEditor::EuphoriaEditor (EuphoriaProcessor& p) : juce::AudioProcessorEdit
 
     if (auto xml = juce::XmlDocument::parse (EphLogo::svg)) logo = juce::Drawable::createFromSVG (*xml);
 
+    // tabs: MAIN (the big knob) and SPELLBOOK (shape the spell yourself)
+    for (auto* b : { &mainTab, &bookTab }) { b->setClickingTogglesState (false); addAndMakeVisible (b); }
+    mainTab.setComponentID ("mainTab"); bookTab.setComponentID ("bookTab");
+    mainTab.onClick = [this] { setTab (false); };
+    bookTab.onClick = [this] { setTab (true); };
+    const char* ids[] = { "trimWidth", "trimReverb", "trimDrive", "trimOtt" };
+    for (int i = 0; i < 4; ++i)
+    {
+        auto& t = trims[i];
+        t.setSliderStyle (juce::Slider::LinearHorizontal);
+        t.setTextBoxStyle (juce::Slider::TextBoxRight, false, 64, 26);
+        t.setDoubleClickReturnValue (true, 100.0);
+        t.setColour (juce::Slider::backgroundColourId, border);
+        t.setColour (juce::Slider::thumbColourId, juce::Colours::white);
+        t.setColour (juce::Slider::textBoxTextColourId, text);
+        t.setColour (juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+        t.setColour (juce::Slider::textBoxBackgroundColourId, panel);
+        addChildComponent (t);
+        trimAttach[i] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (proc.apvts, ids[i], t);
+    }
+    resetBook.invertWhenOn = true;
+    resetBook.onClick = [this] { for (auto* id : { "trimWidth", "trimReverb", "trimDrive", "trimOtt" }) if (auto* p2 = proc.apvts.getParameter (id)) p2->setValueNotifyingHost (p2->getDefaultValue()); };
+    addChildComponent (resetBook);
+    setTab (false);
+
     timerCallback();
     startTimerHz (30);
 }
 
 EuphoriaEditor::~EuphoriaEditor() { stopTimer(); }
+
+void EuphoriaEditor::setTab (bool book)
+{
+    showBook = book;
+    mainTab.setToggleState (! book, juce::dontSendNotification);
+    bookTab.setToggleState (book, juce::dontSendNotification);
+    knob.setVisible (! book);
+    for (auto& t : trims) t.setVisible (book);
+    resetBook.setVisible (book);
+    repaint();
+}
 
 juce::Colour EuphoriaEditor::accentColour() const { return proc.isBright() ? cyan : violet; }
 
@@ -283,7 +319,10 @@ void EuphoriaEditor::timerCallback()
     knob.time = t;
     knob.repaint();
 
-    dark.accent = bright.accent = accent;
+    dark.accent = bright.accent = mainTab.accent = bookTab.accent = accent;
+    for (auto& t : trims) t.setColour (juce::Slider::trackColourId, accent);
+    mainTab.repaint(); bookTab.repaint();
+    if (showBook) repaint (bookArea);
     dark.setToggleState (! proc.isBright(), juce::dontSendNotification);
     bright.setToggleState (proc.isBright(), juce::dontSendNotification);
     bypass.setButtonText (proc.isBypassed() ? "BYPASSED" : "BYPASS");
@@ -337,10 +376,37 @@ void EuphoriaEditor::paint (juce::Graphics& g)
     g.setColour (dim); g.setFont (font (12.0f));
     g.drawText (EphyView::spellFor (k, asleep), rankArea.withTrimmedTop (46).withHeight (16), juce::Justification::centred);
 
-    // hint under the knob
-    g.setColour (dim); g.setFont (font (12.0f));
-    g.drawText ("Drag to cast  |  double-click resets  |  Shift = fine", knob.getBounds().withY (knob.getBottom() + 6).withHeight (16).expanded (60, 0),
-                juce::Justification::centred);
+    if (! showBook)
+    {
+        // hint under the knob
+        g.setColour (dim); g.setFont (font (12.0f));
+        g.drawText ("Drag to cast  |  double-click resets  |  Shift = fine", knob.getBounds().withY (knob.getBottom() + 6).withHeight (16).expanded (60, 0),
+                    juce::Justification::centred);
+    }
+    else
+    {
+        // the Spellbook: shape what the knob does
+        auto b = bookArea.toFloat();
+        g.setColour (panel); g.fillRoundedRectangle (b, 14.0f);
+        g.setColour (border); g.drawRoundedRectangle (b.reduced (0.5f), 14.0f, 1.0f);
+        auto r = bookArea.reduced (22, 16);
+        g.setColour (gold); g.setFont (font (11.0f, true).withExtraKerningFactor (0.25f));
+        g.drawText ("SPELLBOOK", r.removeFromTop (16), juce::Justification::left);
+        g.setColour (dim); g.setFont (font (12.0f));
+        g.drawText ("100 % = Ephy's default spell. The big knob still drives it all.", r.removeFromTop (18), juce::Justification::left);
+        const auto m = proc.mapping (asleep ? 0.0f : proc.amount01());
+        const juce::String names[] = { "Width", "Reverb", "Drive", "OTT" };
+        const juce::String now[] = { juce::String (juce::roundToInt (m.width)) + "% wide", juce::String (juce::roundToInt (m.reverbMix * 100)) + "% reverb",
+                                     juce::String (m.driveDb, 1) + " dB drive", juce::String (juce::roundToInt (m.ottDepth * 100)) + "% OTT" };
+        for (int i = 0; i < 4; ++i)
+        {
+            const auto row = trims[i].getBounds();
+            g.setColour (text); g.setFont (font (15.0f, true));
+            g.drawText (names[i], bookArea.getX() + 22, row.getY() - 18, 120, 18, juce::Justification::left);
+            g.setColour (dim); g.setFont (font (12.0f));
+            g.drawText ("now: " + now[i], row.getRight() - 220, row.getY() - 18, 220, 18, juce::Justification::right);
+        }
+    }
 
     // three spell stages
     {
@@ -373,7 +439,7 @@ void EuphoriaEditor::paint (juce::Graphics& g)
 
     // readouts
     {
-        const auto m = eup::Mapping::forAmount (k, proc.isBright());
+        const auto m = proc.mapping (k);
         auto b = readoutArea.toFloat();
         g.setColour (panel); g.fillRoundedRectangle (b, 12.0f);
         g.setColour (border); g.drawRoundedRectangle (b.reduced (0.5f), 12.0f, 1.0f);
@@ -405,9 +471,17 @@ void EuphoriaEditor::resized()
 
     // right: knob, stages, readouts
     const int rx = 36 + 400 + 28, rw = kW - 36 - rx;
-    knob.setBounds (rx + (rw - 320) / 2, 104, 320, 320);
-    stagesArea = { rx, 456, rw, 76 };
-    readoutArea = { rx, 546, rw, 62 };
+    mainTab.setBounds (rx, 96, 90, 30);
+    bookTab.setBounds (rx + 96, 96, 120, 30);
+    knob.setBounds (rx + (rw - 300) / 2, 134, 300, 300);
+    bookArea = { rx, 134, rw, 318 };
+    {
+        auto r = bookArea.reduced (22, 16).withTrimmedTop (56);
+        for (auto& t : trims) { r.removeFromTop (18); t.setBounds (r.removeFromTop (28)); r.removeFromTop (4); }
+        resetBook.setBounds (bookArea.getRight() - 22 - 150, bookArea.getBottom() - 16 - 30, 150, 30);
+    }
+    stagesArea = { rx, 466, rw, 76 };
+    readoutArea = { rx, 556, rw, 62 };
 
     licensePanel.setBounds (getLocalBounds());
 }

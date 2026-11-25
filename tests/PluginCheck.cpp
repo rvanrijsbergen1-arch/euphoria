@@ -54,9 +54,10 @@ double rmsDb (const juce::AudioBuffer<float>& b, int from, int to)
     return 10.0 * std::log10 (s / (double) (b.getNumChannels() * (to - from)) + 1e-20);
 }
 
-juce::AudioBuffer<float> runEngine (const juce::AudioBuffer<float>& in, float amount, bool bright, bool bypassed = false)
+juce::AudioBuffer<float> runEngine (const juce::AudioBuffer<float>& in, float amount, bool bright, bool bypassed = false, eup::Trims trims = {})
 {
     eup::Engine e;
+    e.setTrims (trims);
     e.setAmount (amount);
     e.setBright (bright);
     e.setBypassed (bypassed);
@@ -106,6 +107,23 @@ int main()
             check (finite && peak < 4.0f, juce::String::formatted ("finite output, sane peak at %d%% %s", (int) (a * 100), bright ? "bright" : "dark"));
             check (std::abs (d) < 2.0, juce::String::formatted ("loudness within 2 dB of the input at %d%% %s (%+.2f dB)", (int) (a * 100), bright ? "bright" : "dark", d));
         }
+
+    // 1b. Spellbook trims: extremes stay finite and roughly level
+    for (int which = 0; which < 4; ++which)
+        for (float v : { 0.0f, 2.0f })
+            for (float a : { 0.5f, 1.0f })
+            {
+                eup::Trims t;
+                (which == 0 ? t.width : which == 1 ? t.reverb : which == 2 ? t.drive : t.ott) = v;
+                const auto out = runEngine (lead, a, true, false, t);
+                float peak = 0;
+                const bool finite = allFinite (out, peak);
+                const double d = rmsDb (out, from, to) - inDb;
+                const char* nm[] = { "width", "reverb", "drive", "ott" };
+                std::printf ("     spellbook %-6s %3d%% at %3d%%  level %+.2f dB  peak %.2f\n", nm[which], (int) (v * 100), (int) (a * 100), d, peak);
+                check (finite && peak < 4.0f && std::abs (d) < 1.0,
+                       juce::String::formatted ("spellbook %s %d%% at %d%%: finite and within 1 dB (%+.2f dB)", nm[which], (int) (v * 100), (int) (a * 100), d));
+            }
 
     // 2. transparent at 0 %: same level, nearly no stereo change
     {
@@ -188,6 +206,7 @@ int main()
         p.prepareToPlay (kSr, 512);
         p.apvts.getParameter ("amount")->setValueNotifyingHost (0.8f);
         p.apvts.getParameter ("tone")->setValueNotifyingHost (0.0f);
+        p.apvts.getParameter ("trimReverb")->setValueNotifyingHost (0.75f);   // 150 %
         juce::AudioBuffer<float> buf (2, 512);
         juce::MidiBuffer midi;
         bool finite = true;
@@ -204,7 +223,7 @@ int main()
         p.getStateInformation (state);
         EuphoriaProcessor q;
         q.setStateInformation (state.getData(), (int) state.getSize());
-        check (std::abs (q.amount01() - 0.8f) < 0.002f && ! q.isBright(), "state is saved and restored");
+        check (std::abs (q.amount01() - 0.8f) < 0.002f && ! q.isBright() && std::abs (q.trims().reverb - 1.5f) < 0.01f, "state (incl. spellbook) is saved and restored");
 
         // mono track
         EuphoriaProcessor mono;
@@ -231,6 +250,20 @@ int main()
                 juce::PNGImageFormat().writeImageToStream (img, os);
                 std::printf ("     editor snapshot: %s\n", f.getFullPathName().toRawUTF8());
             }
+            // the Spellbook tab
+            if (auto* book = dynamic_cast<juce::Button*> (ed->findChildWithID ("bookTab")))
+            {
+                book->triggerClick();
+                juce::MessageManager::getInstance()->runDispatchLoopUntil (120);
+                auto img = ed->createComponentSnapshot (ed->getLocalBounds(), true, 1.0f);
+                auto f = juce::File::getSpecialLocation (juce::File::tempDirectory).getChildFile ("eup_editor_spellbook.png");
+                f.deleteFile();
+                juce::FileOutputStream os (f);
+                juce::PNGImageFormat().writeImageToStream (img, os);
+                check (true, "spellbook tab opens");
+                std::printf ("     editor snapshot: %s\n", f.getFullPathName().toRawUTF8());
+            }
+            else check (false, "spellbook tab found");
         }
     }
 

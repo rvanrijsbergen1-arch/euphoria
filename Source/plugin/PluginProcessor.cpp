@@ -11,6 +11,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout EuphoriaProcessor::createLay
                                                             .withStringFromValueFunction ([] (float v, int) { return juce::String (juce::roundToInt (v)) + " %"; })));
     l.add (std::make_unique<juce::AudioParameterChoice> (juce::ParameterID { "tone", 1 }, "Tone", juce::StringArray { "Dark", "Bright" }, 1));
     l.add (std::make_unique<juce::AudioParameterBool> (juce::ParameterID { "bypass", 1 }, "Bypass", false));
+    // Spellbook: multipliers on what the knob sets (100 % = the default spell)
+    for (auto [id, name] : { std::pair<const char*, const char*> { "trimWidth", "Spellbook Width" }, { "trimReverb", "Spellbook Reverb" },
+                             { "trimDrive", "Spellbook Drive" }, { "trimOtt", "Spellbook OTT" } })
+        l.add (std::make_unique<juce::AudioParameterFloat> (juce::ParameterID { id, 1 }, name, juce::NormalisableRange<float> (0.0f, 200.0f, 1.0f), 100.0f,
+                                                            juce::AudioParameterFloatAttributes().withLabel ("%")
+                                                                .withStringFromValueFunction ([] (float v, int) { return juce::String (juce::roundToInt (v)) + " %"; })));
     return l;
 }
 
@@ -22,6 +28,10 @@ EuphoriaProcessor::EuphoriaProcessor()
     amountParam = apvts.getRawParameterValue ("amount");
     toneParam = apvts.getRawParameterValue ("tone");
     bypassParam = dynamic_cast<juce::AudioParameterBool*> (apvts.getParameter ("bypass"));
+    trimParams[0] = apvts.getRawParameterValue ("trimWidth");
+    trimParams[1] = apvts.getRawParameterValue ("trimReverb");
+    trimParams[2] = apvts.getRawParameterValue ("trimDrive");
+    trimParams[3] = apvts.getRawParameterValue ("trimOtt");
     unlockedCache = lic::sharedLicense().isUnlocked();
 }
 
@@ -37,6 +47,7 @@ void EuphoriaProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     engine.setAmount (amount01());
     engine.setBright (isBright());
     engine.setBypassed (isBypassed() || ! isUnlocked());
+    engine.setTrims (trims());
     engine.prepare (sampleRate, samplesPerBlock);
     monoScratch.assign ((size_t) juce::jmax (1, samplesPerBlock) * 2, 0.0f);
 }
@@ -52,6 +63,7 @@ void EuphoriaProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     engine.setAmount (amount01());
     engine.setBright (isBright());
     engine.setBypassed (isBypassed() || ! isUnlocked());
+    engine.setTrims (trims());
 
     double bpm = 150.0, ppq = -1.0;
     bool playing = false;

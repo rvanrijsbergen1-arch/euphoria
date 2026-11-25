@@ -10,6 +10,9 @@
 
 namespace eup
 {
+/** Spellbook trims: multipliers (0..2) on what the knob sets. 1 = the default spell. */
+struct Trims { float width = 1.0f, reverb = 1.0f, drive = 1.0f, ott = 1.0f; };
+
 struct Mapping
 {
     float width = 100.0f;     // %
@@ -25,7 +28,7 @@ struct Mapping
     float autoGainDb = 0.0f;
     float dampingHz = 12000.0f;
 
-    static Mapping forAmount (float amount, bool bright);
+    static Mapping forAmount (float amount, bool bright, const Trims& trims = {});
 };
 
 struct Biquad
@@ -106,6 +109,7 @@ public:
     void setAmount (float a01) { targetAmount = a01 < 0 ? 0 : (a01 > 1 ? 1 : a01); }
     void setBright (bool b) { bright = b; }
     void setBypassed (bool b) { bypassed = b; }
+    void setTrims (const Trims& t) { trims = t; }
     /** Host tempo for reverb ducking. ppq < 0 = not playing (the engine runs its own beat clock). */
     void setTempo (double bpm, double ppqAtBlockStart, bool playing);
 
@@ -123,6 +127,7 @@ private:
     bool bright = true, bypassed = false;
     float wetMix = 1.0f, wetCoef = 0.0f;
     Mapping now;
+    Trims trims;
     bool lastBright = true;
     float lastShelf = -100.0f, lastDamping = -1.0f, lastDecay = -1.0f;
 

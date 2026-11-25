@@ -11,6 +11,11 @@ One-knob euphoric lead enhancer. Turn the knob and Ephy the Wizard shows how muc
 Always: side signal below 150 Hz removed (mono bass), auto gain (level within 0.1 dB over the whole range on a supersaw lead),
 20 ms knob smoothing, 10 ms bypass crossfade. Tone switch Dark / Bright (reverb damping 5 / 12 kHz).
 
+## Spellbook tab
+
+Four multipliers (0-200 %, default 100 %) on what the knob sets: Width (also the chorus), Reverb, Drive and OTT.
+The big knob still drives everything. Auto gain corrects for the trims, so the level stays within 1 dB.
+
 ## Build
 
 ```
@@ -33,4 +38,4 @@ Same license server as HDMM, CEMM and The Final Master (3-day trial, then a seri
 - `Source/dsp/Engine.*` - the audio engine (no JUCE dependency)
 - `Source/plugin/Ephy.*` - Ephy the Wizard, drawn as vectors, reacts to the knob and the audio
 - `Source/plugin/PluginEditor.*` - knob, Dark/Bright, bypass, stages, readouts, license panel
-- `tests/PluginCheck.cpp` - 40 checks: levels, transparency at 0 %, mono bass, bypass, reverb tail, tone, state, editor snapshots
+- `tests/PluginCheck.cpp` - 57 checks: levels, Spellbook trims, transparency at 0 %, mono bass, bypass, reverb tail, tone, state, editor snapshots

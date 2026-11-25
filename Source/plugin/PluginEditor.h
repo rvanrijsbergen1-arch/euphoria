@@ -65,6 +65,12 @@ private:
     EuphoriaProcessor& proc;
     eupui::MagicKnob knob;
     eupui::PillButton dark { "DARK" }, bright { "BRIGHT" }, bypass { "BYPASS" }, licenseButton { "license" };
+    eupui::PillButton mainTab { "MAIN" }, bookTab { "SPELLBOOK" }, resetBook { "RESET SPELLBOOK" };
+    juce::Slider trims[4];
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> trimAttach[4];
+    bool showBook = false;
+    juce::Rectangle<int> bookArea;
+    void setTab (bool book);
     EphyView ephy;
     eupui::LicensePanel licensePanel;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> knobAttach;
