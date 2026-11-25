@@ -309,7 +309,7 @@ juce::Colour EuphoriaEditor::accentColour() const { return proc.isBright() ? cya
 
 void EuphoriaEditor::timerCallback()
 {
-    const double t = (juce::Time::getMillisecondCounterHiRes() - startMs) * 0.001;
+    const double t = fixedTime >= 0.0 ? fixedTime : (juce::Time::getMillisecondCounterHiRes() - startMs) * 0.001;
     const auto accent = accentColour();
     const bool asleep = proc.isBypassed() || ! proc.isUnlocked();
     const float k = proc.amount01();

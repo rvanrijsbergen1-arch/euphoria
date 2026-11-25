@@ -58,8 +58,13 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    /** Offline rendering (promo videos): stop the live timer and draw the state at time t (seconds). */
+    void renderAt (double t) { stopTimer(); fixedTime = t; timerCallback(); licenseButton.setVisible (false); }
+    void showSpellbook (bool b) { setTab (b); }
+
 private:
     void timerCallback() override;
+    double fixedTime = -1.0;
     juce::Colour accentColour() const;
 
     EuphoriaProcessor& proc;
