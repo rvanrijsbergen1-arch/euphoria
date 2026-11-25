@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>EUPHORIA parameter mapping</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#5EE7FF}a:hover{color:#B5F4FF}
+td,th{padding:9px 12px;text-align:left;border-bottom:1px solid #2A2348;font-size:13px}
+th{font-size:11px;letter-spacing:1.5px;color:#A39CC4;font-weight:600}
+</style>
+</helmet>
+<div style="width: 1200px; box-sizing: border-box; padding: 48px; background: #07060F; color: #F2F2F7; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column; gap: 28px">
+  <div style="display: flex; flex-direction: column; gap: 6px">
+    <div style="font-size: 11px; letter-spacing: 3px; font-weight: 600; color: #A39CC4">EPH SAMPLES · EUPHORIA · SPEC v0.2</div>
+    <h1 style="margin: 0; font-family: Cinzel, serif; font-size: 36px; font-weight: 800">One knob, eleven parameters, Ephy the Wizard</h1>
+    <p style="margin: 0; font-size: 15px; color: #CFC9E8; max-width: 860px">All values interpolate linearly between the four anchor points. Signal chain: Saturation → Chorus → Unison doubler → Stereo width → Reverb (ducked) → OTT → High shelf → Auto gain.</p>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums">
+    <thead>
+      <tr><th>SPELL</th><th>PARAMETER</th><th>0%</th><th>30%</th><th>70%</th><th>100%</th><th>NOTE</th></tr>
+    </thead>
+    <tbody>
+      <tr><td style="color: #5EE7FF">Charm</td><td>Stereo width</td><td>100%</td><td>130%</td><td>140%</td><td>150%</td><td>Mid/side; always mono below 150 Hz</td></tr>
+      <tr><td style="color: #5EE7FF">Charm</td><td>Chorus mix</td><td>0%</td><td>25%</td><td>25%</td><td>25%</td><td>Rate 0.4 Hz, depth 3 ms</td></tr>
+      <tr><td style="color: #5EE7FF">Charm</td><td>Saturation drive</td><td>0 dB</td><td>3 dB</td><td>6 dB</td><td>9 dB</td><td>Soft tape curve, 2× oversampling</td></tr>
+      <tr><td style="color: #B18CFF">Conjure</td><td>Reverb mix</td><td>0%</td><td>0%</td><td>25%</td><td>40%</td><td>Hall algorithm, 300 Hz low cut on the tail</td></tr>
+      <tr><td style="color: #B18CFF">Conjure</td><td>Reverb decay</td><td>1.5 s</td><td>1.5 s</td><td>4.0 s</td><td>6.0 s</td><td>Damping set by the Tone switch</td></tr>
+      <tr><td style="color: #B18CFF">Conjure</td><td>Pre-delay</td><td>20 ms</td><td>20 ms</td><td>35 ms</td><td>40 ms</td><td>Keeps the lead's attack dry</td></tr>
+      <tr><td style="color: #B18CFF">Conjure</td><td>Reverb ducking</td><td>0 dB</td><td>0 dB</td><td>6 dB</td><td>9 dB</td><td>Tempo-synced to host BPM (1/4), no sidechain routing</td></tr>
+      <tr><td style="color: #FFB547">Ascend</td><td>OTT depth</td><td>0%</td><td>0%</td><td>0%</td><td>40%</td><td>3-band up/down, fixed settings</td></tr>
+      <tr><td style="color: #FFB547">Ascend</td><td>High shelf 10 kHz</td><td>0 dB</td><td>0 dB</td><td>0 dB</td><td>+1 / +4 dB</td><td>The sparkle; max depends on Dark / Bright</td></tr>
+      <tr><td style="color: #FFB547">Ascend</td><td>Unison doubler</td><td>0 ct</td><td>0 ct</td><td>0 ct</td><td>±15 ct</td><td>2 voices, panned L/R, 30% mix</td></tr>
+      <tr><td style="color: #A39CC4">Always</td><td>Tone switch</td><td colspan="4">Dark: reverb damping 5 kHz, shelf max +1 dB, warmer saturation · Bright: damping 12 kHz, shelf max +4 dB</td><td>Default Bright; UI turns violet in Dark</td></tr>
+      <tr><td style="color: #A39CC4">Always</td><td>Auto gain</td><td>0 dB</td><td>−1 dB</td><td>−2.5 dB</td><td>−4 dB</td><td>Equal loudness for a fair A/B with bypass</td></tr>
+    </tbody>
+  </table>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+    <div style="padding: 20px; border-radius: 14px; background: #110D22; border: 1px solid #2A2348; display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0; font-family: Cinzel, serif; font-size: 18px">Ephy the Wizard (USP)</h2>
+      <p style="margin: 0; font-size: 13px; line-height: 1.55; color: #CFC9E8">EPH SAMPLES mascot, reusable across plugins. Ranks follow the knob: Apprentice → Sorcerer → Archmage → Grand Archmage at 100%. The staff orb, rays, sparks, aura, glowing eyes and the magic circle at his feet all grow with the amount. Idle float speeds up as power rises. Later: audio-reactive orb pulse on transients.</p>
+    </div>
+    <div style="padding: 20px; border-radius: 14px; background: #110D22; border: 1px solid #2A2348; display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0; font-family: Cinzel, serif; font-size: 18px">The knob</h2>
+      <p style="margin: 0; font-size: 13px; line-height: 1.55; color: #CFC9E8">37 rune dots light up along the sweep. Two counter-rotating rune rings spin faster as you turn. The inner star rotates and fills. Double-click resets to 0%, Shift-drag for fine control, 20 ms smoothing against zipper noise.</p>
+    </div>
+    <div style="padding: 20px; border-radius: 14px; background: #110D22; border: 1px solid #2A2348; display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0; font-family: Cinzel, serif; font-size: 18px">Release</h2>
+      <p style="margin: 0; font-size: 13px; line-height: 1.55; color: #CFC9E8">VST3 and AU, Windows and Mac. DSP reused from Lead Synth and The Final Master. Serial activation like HDMM, sold via Stripe on ephoric.nl/shop. Price: [YOUR PRICE], suggested €9.99 or bundled with CEMM.</p>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1200,"height":980}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

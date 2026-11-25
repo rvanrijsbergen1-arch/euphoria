@@ -1,0 +1,27 @@
+EUPHORIA by EPH SAMPLES - quick start
+=====================================
+
+Put Euphoria on your lead (or pads, chords, plucks, vocals) and turn the knob.
+That's it. Ephy the Wizard shows how much magic you are casting.
+
+THE KNOB
+   0-30 %    CHARM     stereo width, a light chorus and warm tape saturation
+   30-70 %   CONJURE   a big hall reverb that ducks in time with your track (no sidechain routing)
+   70-100 %  ASCEND    OTT-style compression, sparkle on top and a unison doubler
+
+   Drag up/down or left/right. Double-click = back to 0 %. Hold Shift while dragging for fine control.
+   The knob can be automated: open it slowly towards your drop.
+
+DARK / BRIGHT
+   BRIGHT  fresh and open (default)
+   DARK    warmer and softer: darker reverb, less sparkle, warmer saturation
+
+ALWAYS ON
+   - Everything below 150 Hz stays mono, so your low end stays tight however wide you go.
+   - Auto gain keeps the level about the same, so BYPASS is a fair comparison: better, not just louder.
+
+LICENSE
+   The first 3 days are a free trial. Then enter the serial code from your order e-mail
+   (click the status text at the top of the plugin).
+
+www.ephoric.nl

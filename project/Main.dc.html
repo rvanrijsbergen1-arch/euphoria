@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>EUPHORIA plugin</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#07060F}
+a{color:#5EE7FF}a:hover{color:#B5F4FF}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spinback{to{transform:rotate(-360deg)}}
+@keyframes twinkle{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.knob-range{-webkit-appearance:none;appearance:none;background:transparent;cursor:grab}
+.knob-range:focus-visible{outline:2px solid #5EE7FF;outline-offset:6px;border-radius:50%}
+</style>
+</helmet>
+<div style="width: 980px; height: 700px; box-sizing: border-box; padding: 28px 36px 32px; background: radial-gradient(ellipse at 30% 60%, #1A1235 0%, #07060F 65%); color: #F2F2F7; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column; gap: 18px; border-radius: 18px; border: 1px solid #2A2348">
+  <div style="display: flex; justify-content: space-between; align-items: center">
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <div style="font-size: 11px; letter-spacing: 3px; font-weight: 600; color: #A39CC4">EPH SAMPLES</div>
+      <div style="font-family: Cinzel, serif; font-size: 32px; font-weight: 800; letter-spacing: 8px">EUPHORIA</div>
+    </div>
+    <div style="display: flex; gap: 12px; align-items: center">
+      <div role="group" aria-label="Tone" style="display: flex; padding: 3px; border-radius: 12px; background: #110D22; border: 1px solid #2A2348">
+        <button onClick="{{setDark}}" aria-pressed="{{darkAria}}" style="{{darkStyle}}">DARK</button>
+        <button onClick="{{setBright}}" aria-pressed="{{brightAria}}" style="{{brightStyle}}">BRIGHT</button>
+      </div>
+      <button onClick="{{toggleBypass}}" aria-pressed="{{bypassAria}}" style="{{bypassStyle}}">{{bypassLabel}}</button>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 28px; flex-grow: 1; min-height: 0">
+    <div style="width: 400px; display: flex; flex-direction: column; align-items: center; gap: 6px">
+      <div style="font-size: 11px; letter-spacing: 3px; font-weight: 600; color: #C9A646">EPHY THE WIZARD</div>
+      <div style="{{rankStyle}}">{{rank}}</div>
+      <div style="font-size: 12px; color: #A39CC4; letter-spacing: 1px">{{spell}}</div>
+      <svg width="400" height="480" viewBox="0 0 400 520" role="img" aria-label="{{wizardLabel}}" style="overflow: visible">
+        <defs>
+          <radialGradient id="aura"><stop offset="0%" stop-color="{{accent}}" stop-opacity="0.55"></stop><stop offset="100%" stop-color="{{accent}}" stop-opacity="0"></stop></radialGradient>
+          <radialGradient id="orb"><stop offset="0%" stop-color="#FFFFFF"></stop><stop offset="35%" stop-color="{{accent}}"></stop><stop offset="100%" stop-color="{{accent}}" stop-opacity="0"></stop></radialGradient>
+          <linearGradient id="robe" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3A2C7A"></stop><stop offset="100%" stop-color="#1B1440"></stop></linearGradient>
+        </defs>
+        <circle cx="210" cy="300" r="{{auraR}}" fill="url(#aura)" opacity="{{auraOp}}"></circle>
+        <g style="transform-origin: 200px 500px; transform-box: view-box">
+          <ellipse cx="200" cy="500" rx="{{circleRx}}" ry="{{circleRy}}" fill="none" stroke="{{accent}}" stroke-width="2" stroke-dasharray="6 8" opacity="{{circleOp}}"></ellipse>
+          <ellipse cx="200" cy="500" rx="{{circleRx2}}" ry="{{circleRy2}}" fill="none" stroke="{{accent}}" stroke-width="1" opacity="{{circleOp}}"></ellipse>
+        </g>
+        <g style="{{floatStyle}}">
+          <g stroke="#0E0A1F" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+            <path d="M130 500 Q118 385 168 300 L242 300 Q290 385 278 500 Q204 516 130 500 Z" fill="url(#robe)"></path>
+            <path d="M140 500 Q118 494 120 512 L170 512 Q176 500 160 498 Z" fill="#2E2266"></path>
+            <path d="M268 500 Q292 492 296 506 Q290 516 248 512 Q244 502 268 500 Z" fill="#2E2266"></path>
+            <path d="M162 360 Q205 376 248 360 L250 380 Q205 396 160 380 Z" fill="#C9A646"></path>
+            <path d="M170 305 Q118 340 114 398 Q138 410 158 394 Q160 352 184 322 Z" fill="#4A33B0"></path>
+            <circle cx="124" cy="402" r="12" fill="#F2C9A0"></circle>
+            <line x1="306" y1="505" x2="306" y2="172" stroke="#6B4A2E" stroke-width="10"></line>
+            <path d="M306 176 Q284 160 292 136 M306 176 Q328 160 320 136" stroke="#6B4A2E" stroke-width="6" fill="none"></path>
+            <path d="M168 300 Q205 334 242 300" fill="none" stroke="#1FB5A8" stroke-width="7"></path>
+            <ellipse cx="166" cy="296" rx="11" ry="14" fill="#1FB5A8"></ellipse>
+            <ellipse cx="244" cy="296" rx="11" ry="14" fill="#1FB5A8"></ellipse>
+            <circle cx="205" cy="246" r="42" fill="#F2C9A0"></circle>
+            <path d="M166 254 Q168 302 190 308 Q205 302 220 308 Q242 302 244 254 Q205 278 166 254 Z" fill="#F4F1FA"></path>
+            <path d="M190 304 q-7 10 0 18 q-7 10 0 18 q-7 10 0 16 M220 304 q7 10 0 18 q7 10 0 18 q7 10 0 16" fill="none" stroke="#F4F1FA" stroke-width="11"></path>
+          </g>
+          <circle cx="190" cy="362" r="5" fill="#C9A646" stroke="#0E0A1F" stroke-width="2"></circle>
+          <circle cx="220" cy="362" r="5" fill="#C9A646" stroke="#0E0A1F" stroke-width="2"></circle>
+          <path d="M182 300 L178 318 M228 300 L232 318" stroke="#0E0A1F" stroke-width="2" opacity="0.25"></path>
+          <g stroke="#0E0A1F" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+            <path d="M178 260 Q205 244 232 260 Q216 272 205 263 Q194 272 178 260 Z" fill="#FFFFFF"></path>
+            <ellipse cx="205" cy="250" rx="10" ry="8" fill="#E8A882"></ellipse>
+            <ellipse cx="190" cy="232" rx="8" ry="10" fill="#FFFFFF"></ellipse>
+            <ellipse cx="220" cy="232" rx="8" ry="10" fill="#FFFFFF"></ellipse>
+          </g>
+          <circle cx="190" cy="232" r="10" fill="{{accent}}" opacity="{{eyeGlow}}"></circle>
+          <circle cx="220" cy="232" r="10" fill="{{accent}}" opacity="{{eyeGlow}}"></circle>
+          <circle cx="191" cy="234" r="4" fill="{{eyeColor}}"></circle>
+          <circle cx="221" cy="234" r="4" fill="{{eyeColor}}"></circle>
+          <path d="M176 220 Q190 208 200 220 M210 220 Q220 208 234 220" fill="none" stroke="#F4F1FA" stroke-width="7" stroke-linecap="round"></path>
+          <g stroke="#0E0A1F" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+            <path d="M158 210 Q168 142 192 94 Q204 66 212 40 Q224 92 238 142 Q250 182 252 210 Z" fill="#1F6F8B"></path>
+            <ellipse cx="205" cy="212" rx="76" ry="15" fill="#1A5C74"></ellipse>
+            <path d="M162 196 Q205 206 250 196 L252 208 Q205 218 160 208 Z" fill="#1FB5A8"></path>
+            <path d="M212 26 l4 8 l9 1 l-7 6 l2 9 l-8 -5 l-8 5 l2 -9 l-7 -6 l9 -1 z" fill="#C9A646"></path>
+            <path d="M236 306 Q276 302 300 284 L312 304 Q282 332 246 336 Z" fill="#4A33B0"></path>
+            <circle cx="306" cy="296" r="12" fill="#F2C9A0"></circle>
+          </g>
+          <path d="M202 198 l-6 10 h6 l-4 9 l10 -12 h-6 l4 -7 z" fill="#FFE9A8"></path>
+          <path d="M150 440 l3 6 l7 1 l-5 5 l1 7 l-6 -3 l-6 3 l1 -7 l-5 -5 l7 -1 z M250 430 l3 6 l7 1 l-5 5 l1 7 l-6 -3 l-6 3 l1 -7 l-5 -5 l7 -1 z M200 470 l2 4 l5 1 l-4 3 l1 5 l-4 -2 l-4 2 l1 -5 l-4 -3 l5 -1 z" fill="#C9A646"></path>
+        </g>
+        <path d="{{rays}}" stroke="{{accent}}" stroke-width="2" stroke-linecap="round" fill="none" opacity="{{rayOp}}"></path>
+        <circle cx="306" cy="140" r="{{glowR}}" fill="url(#orb)" opacity="{{glowOp}}"></circle>
+        <g style="transform-origin: 306px 140px; transform-box: view-box; animation: pulse 1.6s ease-in-out infinite">
+          <circle cx="306" cy="140" r="{{coreR}}" fill="#FFFFFF" opacity="{{coreOp}}"></circle>
+        </g>
+        <path d="{{sparks}}" fill="{{accent}}" style="animation: twinkle 1.2s ease-in-out infinite"></path>
+        <path d="{{sparks2}}" fill="#FFFFFF" style="animation: twinkle 1.7s ease-in-out infinite 0.4s"></path>
+      </svg>
+    </div>
+
+    <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; gap: 16px">
+      <div style="position: relative; width: 320px; height: 320px">
+        <svg width="320" height="320" viewBox="0 0 320 320" aria-hidden="true" style="position: absolute; inset: 0; overflow: visible">
+          <defs>
+            <radialGradient id="kglow"><stop offset="55%" stop-color="{{accent}}" stop-opacity="0"></stop><stop offset="75%" stop-color="{{accent}}" stop-opacity="0.35"></stop><stop offset="100%" stop-color="{{accent}}" stop-opacity="0"></stop></radialGradient>
+            <radialGradient id="kbody" cx="40%" cy="35%"><stop offset="0%" stop-color="#3B2E78"></stop><stop offset="70%" stop-color="#151030"></stop><stop offset="100%" stop-color="#0C0920"></stop></radialGradient>
+          </defs>
+          <circle cx="160" cy="160" r="160" fill="url(#kglow)" opacity="{{kGlowOp}}"></circle>
+          <path d="{{dotsOff}}" fill="#2E2752"></path>
+          <path d="{{dotsOn}}" fill="{{accent}}"></path>
+          <g style="{{spinA}}">
+            <circle cx="160" cy="160" r="128" fill="none" stroke="{{accent}}" stroke-width="1.5" stroke-dasharray="2 10 14 10" opacity="{{runeOp}}"></circle>
+            <path d="M160 26 l5 9 l-5 9 l-5 -9 z M160 276 l5 9 l-5 9 l-5 -9 z M26 160 l9 -5 l9 5 l-9 5 z M276 160 l9 -5 l9 5 l-9 5 z" fill="{{accent}}" opacity="{{runeOp}}"></path>
+          </g>
+          <g style="{{spinB}}">
+            <circle cx="160" cy="160" r="116" fill="none" stroke="#C9A646" stroke-width="1" stroke-dasharray="1 7" opacity="0.8"></circle>
+          </g>
+          <circle cx="160" cy="160" r="104" fill="url(#kbody)" stroke="#4A3D8F" stroke-width="2"></circle>
+          <g transform="{{starRot}}">
+            <path d="M160 92 L172 148 L228 160 L172 172 L160 228 L148 172 L92 160 L148 148 Z" fill="none" stroke="{{accent}}" stroke-width="1.5" opacity="{{starOp}}"></path>
+            <path d="M160 116 L166 154 L204 160 L166 166 L160 204 L154 166 L116 160 L154 154 Z" fill="{{accent}}" opacity="{{starFill}}"></path>
+          </g>
+          <circle cx="{{gemX}}" cy="{{gemY}}" r="8" fill="#FFFFFF" stroke="{{accent}}" stroke-width="3"></circle>
+        </svg>
+        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none">
+          <div style="font-family: Cinzel, serif; font-size: 46px; font-weight: 800; line-height: 1; text-shadow: 0 0 18px #000">{{pct}}</div>
+        </div>
+        <input class="knob-range" type="range" min="0" max="100" step="1" value="{{value}}" onChange="{{onKnob}}" aria-label="Euphoria amount" style="position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0">
+      </div>
+      <div style="font-size: 12px; color: #A39CC4">Drag across the knob to cast</div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%">
+        <sc-for list="{{stages}}" as="s" hint-placeholder-count="3">
+          <div style="{{s.style}}">
+            <div style="font-size: 11px; letter-spacing: 1.5px; font-weight: 600">{{s.range}}</div>
+            <div style="font-family: Cinzel, serif; font-size: 16px; font-weight: 800">{{s.name}}</div>
+            <div style="font-size: 11px; opacity: 0.85">{{s.desc}}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; width: 100%; box-sizing: border-box; padding: 12px; border-radius: 12px; background: #110D22; border: 1px solid #2A2348">
+        <sc-for list="{{readouts}}" as="r" hint-placeholder-count="4">
+          <div style="display: flex; flex-direction: column; gap: 4px; align-items: center">
+            <div style="font-size: 11px; color: #A39CC4; letter-spacing: 1px">{{r.label}}</div>
+            <div style="font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums">{{r.val}}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#5EE7FF","options":["#5EE7FF","#B18CFF","#FF6FB5","#FFB547"]},"$preview":{"width":980,"height":700}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { v: 45, bypass: false, tone: 'bright' }; }
+  renderVals() {
+    const dark = this.state.tone === 'dark';
+    const accent = dark ? '#9B7BFF' : (this.props.accent ?? '#5EE7FF');
+    const seg = (on) => 'min-height: 38px; min-width: 72px; padding: 0 12px; border-radius: 9px; border: none; cursor: pointer; font: 600 12px Inter, sans-serif; letter-spacing: 1.5px; ' + (on ? 'background: ' + accent + '; color: #07060F' : 'background: transparent; color: #A39CC4');
+    const by = this.state.bypass;
+    const k = by ? 0 : this.state.v / 100;
+    const kk = this.state.v / 100;
+    const lerp = (pts, x) => {
+      for (let i = 1; i < pts.length; i++) {
+        const [x0, y0] = pts[i - 1], [x1, y1] = pts[i];
+        if (x <= x1) return y0 + (y1 - y0) * ((x - x0) / (x1 - x0));
+      }
+      return pts[pts.length - 1][1];
+    };
+    const dot = (x, y, r) => 'M' + (x - r).toFixed(1) + ' ' + y.toFixed(1) + ' a' + r + ' ' + r + ' 0 1 0 ' + (2 * r) + ' 0 a' + r + ' ' + r + ' 0 1 0 ' + (-2 * r) + ' 0 ';
+    const fill = kk * 270;
+    let on = '', off = '';
+    for (let i = 0; i <= 36; i++) {
+      const deg = i * 7.5;
+      const a = (deg - 225) * Math.PI / 180;
+      const d = dot(160 + Math.cos(a) * 146, 160 + Math.sin(a) * 146, i % 6 === 0 ? 4 : 2.6);
+      if (!by && deg <= fill) on += d; else off += d;
+    }
+    const ga = (fill - 225) * Math.PI / 180;
+    let sparks = '', sparks2 = '';
+    const n = Math.round(k * 26);
+    for (let i = 0; i < n; i++) {
+      const ang = i * 2.399;
+      const rad = 30 + ((i * 37) % 100) * (0.4 + k * 1.1);
+      const x = 306 + Math.cos(ang) * rad, y = 140 + Math.sin(ang) * rad * 0.9;
+      if (i % 3 === 0) sparks2 += dot(x, y, 1.6 + k * 1.2); else sparks += dot(x, y, 1.8 + k * 2);
+    }
+    let rays = '';
+    const nr = Math.round(k * 14);
+    for (let i = 0; i < nr; i++) {
+      const a = i * (Math.PI * 2 / Math.max(nr, 1)) + 0.3;
+      const len = 24 + k * 70 * (0.6 + (i % 3) * 0.2);
+      rays += 'M' + (306 + Math.cos(a) * 20).toFixed(1) + ' ' + (140 + Math.sin(a) * 20).toFixed(1) + ' L' + (306 + Math.cos(a) * len).toFixed(1) + ' ' + (140 + Math.sin(a) * len).toFixed(1) + ' ';
+    }
+    const rank = k >= 0.995 ? 'GRAND ARCHMAGE' : k >= 0.7 ? 'ARCHMAGE' : k >= 0.3 ? 'SORCERER' : k > 0 ? 'APPRENTICE' : 'RESTING';
+    const spell = k >= 0.7 ? 'casting: Festival Ascension' : k >= 0.3 ? 'casting: Hall of Echoes' : k > 0 ? 'casting: Wide Charm' : 'Ephy is taking a nap';
+    const width = lerp([[0, 100], [0.3, 130], [0.7, 140], [1, 150]], k);
+    const verb = lerp([[0, 0], [0.3, 0], [0.7, 25], [1, 40]], k);
+    const drive = lerp([[0, 0], [0.3, 3], [0.7, 6], [1, 9]], k);
+    const ott = lerp([[0, 0], [0.7, 0], [1, 40]], k);
+    const spinDur = (14 - k * 11).toFixed(1);
+    const stagesDef = [
+      { name: 'Charm', range: '0–30%', desc: 'width · shimmer', at: 0.01 },
+      { name: 'Conjure', range: '30–70%', desc: 'hall · breathing', at: 0.3 },
+      { name: 'Ascend', range: '70–100%', desc: 'OTT · sparkle', at: 0.7 }
+    ];
+    return {
+      accent,
+      value: this.state.v,
+      pct: this.state.v,
+      onKnob: (e) => this.setState({ v: Number(e.target.value) }),
+      toggleBypass: () => this.setState({ bypass: !by }),
+      setDark: () => this.setState({ tone: 'dark' }),
+      setBright: () => this.setState({ tone: 'bright' }),
+      darkAria: dark ? 'true' : 'false', brightAria: dark ? 'false' : 'true',
+      darkStyle: seg(dark), brightStyle: seg(!dark),
+      bypassAria: by ? 'true' : 'false',
+      bypassLabel: by ? 'BYPASSED' : 'BYPASS',
+      bypassStyle: 'min-height: 44px; padding: 0 16px; border-radius: 10px; font: 600 12px Inter, sans-serif; letter-spacing: 1.5px; cursor: pointer; ' + (by ? 'background: #F2F2F7; color: #07060F; border: 1px solid #F2F2F7' : 'background: transparent; color: #CFC9E8; border: 1px solid #3A3266'),
+      rank, spell,
+      rankStyle: 'font-family: Cinzel, serif; font-size: 22px; font-weight: 800; letter-spacing: 4px; color: ' + (k > 0 ? accent : '#6E6894') + '; text-shadow: 0 0 ' + Math.round(k * 24) + 'px ' + accent,
+      wizardLabel: 'Ephy the Wizard at ' + rank.toLowerCase() + ' power',
+      auraR: Math.round(90 + k * 150), auraOp: (0.15 + k * 0.85).toFixed(2),
+      circleRx: Math.round(50 + k * 110), circleRy: Math.round(10 + k * 22),
+      circleRx2: Math.round(36 + k * 90), circleRy2: Math.round(7 + k * 17), circleOp: (k * 0.9).toFixed(2),
+      floatStyle: 'animation: float ' + (4 - k * 2).toFixed(1) + 's ease-in-out infinite',
+      eyeColor: k >= 0.7 ? '#FFFFFF' : '#1A1430', eyeGlow: (k >= 0.7 ? 0.5 + (k - 0.7) * 1.6 : 0).toFixed(2),
+      glowR: Math.round(14 + k * 70), glowOp: (0.25 + k * 0.75).toFixed(2),
+      coreR: Math.round(6 + k * 8), coreOp: (0.5 + k * 0.5).toFixed(2),
+      rays, rayOp: (0.3 + k * 0.6).toFixed(2), sparks, sparks2,
+      dotsOn: on, dotsOff: off,
+      kGlowOp: (0.15 + k * 0.85).toFixed(2), runeOp: (0.2 + k * 0.8).toFixed(2),
+      spinA: 'transform-origin: 160px 160px; animation: spin ' + spinDur + 's linear infinite',
+      spinB: 'transform-origin: 160px 160px; animation: spinback ' + (spinDur * 1.5).toFixed(1) + 's linear infinite',
+      starRot: 'rotate(' + (fill * 0.5).toFixed(1) + ' 160 160)', starOp: (0.3 + k * 0.7).toFixed(2), starFill: (k * 0.35).toFixed(2),
+      gemX: (160 + Math.cos(ga) * 90).toFixed(1), gemY: (160 + Math.sin(ga) * 90).toFixed(1),
+      stages: stagesDef.map((s) => {
+        const lit = k >= s.at;
+        return { name: s.name, range: s.range, desc: s.desc, style: 'display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; border-radius: 12px; ' + (lit ? 'background: ' + accent + '1F; border: 1px solid ' + accent + '; color: #F2F2F7; box-shadow: 0 0 14px ' + accent + '40' : 'background: #110D22; border: 1px solid #2A2348; color: #8E88B0') };
+      }),
+      readouts: [
+        { label: 'WIDTH', val: Math.round(width) + '%' },
+        { label: 'REVERB', val: Math.round(verb) + '%' },
+        { label: 'DRIVE', val: drive.toFixed(1) + ' dB' },
+        { label: 'OTT', val: Math.round(ott) + '%' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
