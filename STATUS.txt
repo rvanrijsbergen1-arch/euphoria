@@ -1,0 +1,6 @@
+commit=57c55cdb06b60144e62d16d2515e2ad9e1c42389
+run=7
+linux=success
+windows=success
+macos=success
+url=https://github.com/rvanrijsbergen1-arch/euphoria/actions/runs/45740076322
