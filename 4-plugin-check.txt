@@ -1,0 +1,96 @@
+input lead RMS -18.02 dBFS
+     amount   0% bright  level -0.00 dB  peak 0.70
+PASS  finite output, sane peak at 0% 牢杩瑨
+PASS  loudness within 2 dB of the input at 0% 牢杩瑨 (-0.00 dB)
+     amount  15% bright  level +0.00 dB  peak 0.68
+PASS  finite output, sane peak at 15% 牢杩瑨
+PASS  loudness within 2 dB of the input at 15% 牢杩瑨 (+0.00 dB)
+     amount  30% bright  level +0.00 dB  peak 0.73
+PASS  finite output, sane peak at 30% 牢杩瑨
+PASS  loudness within 2 dB of the input at 30% 牢杩瑨 (+0.00 dB)
+     amount  50% bright  level +0.00 dB  peak 0.72
+PASS  finite output, sane peak at 50% 牢杩瑨
+PASS  loudness within 2 dB of the input at 50% 牢杩瑨 (+0.00 dB)
+     amount  70% bright  level +0.00 dB  peak 0.69
+PASS  finite output, sane peak at 70% 牢杩瑨
+PASS  loudness within 2 dB of the input at 70% 牢杩瑨 (+0.00 dB)
+     amount  85% bright  level +0.00 dB  peak 0.77
+PASS  finite output, sane peak at 85% 牢杩瑨
+PASS  loudness within 2 dB of the input at 85% 牢杩瑨 (+0.00 dB)
+     amount 100% bright  level +0.00 dB  peak 0.82
+PASS  finite output, sane peak at 100% 牢杩瑨
+PASS  loudness within 2 dB of the input at 100% 牢杩瑨 (+0.00 dB)
+     amount   0% dark    level -0.00 dB  peak 0.70
+PASS  finite output, sane peak at 0% 慤歲
+PASS  loudness within 2 dB of the input at 0% 慤歲 (-0.00 dB)
+     amount  15% dark    level +0.00 dB  peak 0.69
+PASS  finite output, sane peak at 15% 慤歲
+PASS  loudness within 2 dB of the input at 15% 慤歲 (+0.00 dB)
+     amount  30% dark    level -0.00 dB  peak 0.75
+PASS  finite output, sane peak at 30% 慤歲
+PASS  loudness within 2 dB of the input at 30% 慤歲 (-0.00 dB)
+     amount  50% dark    level +0.00 dB  peak 0.75
+PASS  finite output, sane peak at 50% 慤歲
+PASS  loudness within 2 dB of the input at 50% 慤歲 (+0.00 dB)
+     amount  70% dark    level +0.00 dB  peak 0.74
+PASS  finite output, sane peak at 70% 慤歲
+PASS  loudness within 2 dB of the input at 70% 慤歲 (+0.00 dB)
+     amount  85% dark    level +0.00 dB  peak 0.73
+PASS  finite output, sane peak at 85% 慤歲
+PASS  loudness within 2 dB of the input at 85% 慤歲 (+0.00 dB)
+     amount 100% dark    level -0.00 dB  peak 0.69
+PASS  finite output, sane peak at 100% 慤歲
+PASS  loudness within 2 dB of the input at 100% 慤歲 (-0.00 dB)
+     spellbook width    0% at  50%  level +0.31 dB  peak 0.72
+PASS  spellbook 楷瑤h 0% at 50%: finite and within 1 dB (+0.31 dB)
+     spellbook width    0% at 100%  level +0.53 dB  peak 0.90
+PASS  spellbook 楷瑤h 0% at 100%: finite and within 1 dB (+0.53 dB)
+     spellbook width  200% at  50%  level +0.42 dB  peak 0.82
+PASS  spellbook 楷瑤h 200% at 50%: finite and within 1 dB (+0.42 dB)
+     spellbook width  200% at 100%  level +0.07 dB  peak 0.80
+PASS  spellbook 楷瑤h 200% at 100%: finite and within 1 dB (+0.07 dB)
+     spellbook reverb   0% at  50%  level +0.03 dB  peak 0.72
+PASS  spellbook 敲敶扲 0% at 50%: finite and within 1 dB (+0.03 dB)
+     spellbook reverb   0% at 100%  level +0.26 dB  peak 0.89
+PASS  spellbook 敲敶扲 0% at 100%: finite and within 1 dB (+0.26 dB)
+     spellbook reverb 200% at  50%  level -0.06 dB  peak 0.72
+PASS  spellbook 敲敶扲 200% at 50%: finite and within 1 dB (-0.06 dB)
+     spellbook reverb 200% at 100%  level -0.39 dB  peak 0.70
+PASS  spellbook 敲敶扲 200% at 100%: finite and within 1 dB (-0.39 dB)
+     spellbook drive    0% at  50%  level -0.16 dB  peak 0.76
+PASS  spellbook 牤癩e 0% at 50%: finite and within 1 dB (-0.16 dB)
+     spellbook drive    0% at 100%  level -0.37 dB  peak 0.74
+PASS  spellbook 牤癩e 0% at 100%: finite and within 1 dB (-0.37 dB)
+     spellbook drive  200% at  50%  level +0.66 dB  peak 0.71
+PASS  spellbook 牤癩e 200% at 50%: finite and within 1 dB (+0.66 dB)
+     spellbook drive  200% at 100%  level +0.39 dB  peak 0.96
+PASS  spellbook 牤癩e 200% at 100%: finite and within 1 dB (+0.39 dB)
+     spellbook ott      0% at  50%  level +0.00 dB  peak 0.72
+PASS  spellbook 瑯t 0% at 50%: finite and within 1 dB (+0.00 dB)
+     spellbook ott      0% at 100%  level -0.01 dB  peak 0.79
+PASS  spellbook 瑯t 0% at 100%: finite and within 1 dB (-0.01 dB)
+     spellbook ott    200% at  50%  level +0.00 dB  peak 0.72
+PASS  spellbook 瑯t 200% at 50%: finite and within 1 dB (+0.00 dB)
+     spellbook ott    200% at 100%  level +0.06 dB  peak 1.14
+PASS  spellbook 瑯t 200% at 100%: finite and within 1 dB (+0.06 dB)
+PASS  0 % keeps the level (within 0.2 dB)
+     60 Hz side reduced by 30.6 dB
+PASS  stereo below 150 Hz is folded to mono (side -12 dB or more)
+PASS  high-frequency stereo is kept
+PASS  bypass passes the input unchanged
+     tail 0.6-1.6 s: 30% -200.0 dB, 100% -32.1 dB
+PASS  a big reverb tail at 100 %, none at 30 %
+PASS  tail decays (last second -116.7 dB)
+PASS  Bright has more top end than Dark
+PASS  processor output is finite
+PASS  parameters reach the processor
+PASS  state (incl. spellbook) is saved and restored
+PASS  mono tracks work
+PASS  editor opens at 980 x 700
+     editor snapshot: C:\Users\RUNNER~1\AppData\Local\Temp\eup_editor_0.png
+     editor snapshot: C:\Users\RUNNER~1\AppData\Local\Temp\eup_editor_45.png
+     editor snapshot: C:\Users\RUNNER~1\AppData\Local\Temp\eup_editor_100.png
+PASS  spellbook tab opens
+     editor snapshot: C:\Users\RUNNER~1\AppData\Local\Temp\eup_editor_spellbook.png
+
+57 passed, 0 failed
