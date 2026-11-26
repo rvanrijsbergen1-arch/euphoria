@@ -134,6 +134,7 @@ private:
     // saturation (ADAA)
     float satPrevU[2] {};
     float satPrevY[2] {};
+    LR4 satSplit;
 
     // chorus + doubler
     DelayLine chorusDl[2], dblDl[2];

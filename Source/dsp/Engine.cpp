@@ -41,13 +41,15 @@ namespace
 {
 /** Level correction when the Spellbook moves width, drive or OTT away from the default spell
     (measured on the supersaw lead in tests/PluginCheck.cpp; reverb needs none). */
-float trimCorrectionDb (float k, float tw, float drive0, float drive1, float ott0, float ott1)
+float trimCorrectionDb (float k, float tw, float verb0, float verb1, float drive0, float drive1, float ott0, float ott1)
 {
     const float dW = tw - 1.0f, dD = drive1 - drive0, dO = ott1 - ott0;
     const float widthPresence = k < 0.3f ? k / 0.3f : 1.0f;
+    const float verbDb = -10.0f * std::log10 ((1.0f + 1.2f * verb1 * verb1) / (1.0f + 1.2f * verb0 * verb0));   // hall energy
     return -widthPresence * (dW < 0 ? 1.5f : 2.0f) * dW
-           + (dD < 0 ? 0.125f : 0.31f) * dD
-           + (dO < 0 ? 5.3f : 6.9f) * dO;
+           + (dD < 0 ? 0.125f : 0.15f) * dD
+           + (dO < 0 ? 5.3f : 6.9f) * dO
+           + verbDb;
 }
 }
 Mapping Mapping::forAmount (float k, bool bright, const Trims& t)
@@ -61,11 +63,11 @@ Mapping Mapping::forAmount (float k, bool bright, const Trims& t)
     m.preDelayMs = lerp ({ { 0.0f, 20.0f }, { 0.3f, 20.0f }, { 0.7f, 35.0f }, { 1.0f, 40.0f } }, k);
     m.duckDb     = lerp ({ { 0.0f, 0.0f }, { 0.3f, 0.0f }, { 0.7f, 6.0f }, { 1.0f, 9.0f } }, k);
     m.ottDepth   = lerp ({ { 0.0f, 0.0f }, { 0.7f, 0.0f }, { 1.0f, 0.40f } }, k);
-    m.shelfDb    = lerp ({ { 0.0f, 0.0f }, { 0.7f, 0.0f }, { 1.0f, bright ? 4.0f : 1.0f } }, k);
+    m.shelfDb    = lerp ({ { 0.0f, 0.0f }, { 0.3f, bright ? 1.5f : 0.5f }, { 0.7f, bright ? 2.5f : 0.8f }, { 1.0f, bright ? 4.5f : 1.0f } }, k);
     m.doublerMix = lerp ({ { 0.0f, 0.0f }, { 0.7f, 0.0f }, { 1.0f, 0.30f } }, k);
     // measured with tests/PluginCheck.cpp (supersaw lead) so the level stays put over the whole knob range
-    m.autoGainDb = bright ? lerp ({ { 0.0f, 0.0f }, { 0.15f, -0.15f }, { 0.3f, -0.75f }, { 0.5f, -0.8f }, { 0.7f, -0.85f }, { 0.85f, 0.25f }, { 1.0f, 1.3f } }, k)
-                          : lerp ({ { 0.0f, 0.0f }, { 0.15f, 0.2f }, { 0.3f, -0.3f }, { 0.5f, -0.2f }, { 0.7f, 0.0f }, { 0.85f, 1.2f }, { 1.0f, 2.3f } }, k);
+    m.autoGainDb = bright ? lerp ({ { 0.0f, 0.0f }, { 0.15f, -0.32f }, { 0.3f, -0.98f }, { 0.5f, -1.12f }, { 0.7f, -1.35f }, { 0.85f, -0.44f }, { 1.0f, 0.41f } }, k)
+                          : lerp ({ { 0.0f, 0.0f }, { 0.15f, 0.01f }, { 0.3f, -0.52f }, { 0.5f, -0.49f }, { 0.7f, -0.49f }, { 0.85f, 0.61f }, { 1.0f, 1.59f } }, k);
     m.dampingHz  = bright ? 12000.0f : 5000.0f;
 
     // Spellbook trims (1 = default). Auto gain is calibrated for the default spell; the trims add a rough correction.
@@ -78,7 +80,7 @@ Mapping Mapping::forAmount (float k, bool bright, const Trims& t)
     m.reverbMix = std::min (0.8f, baseVerb * tr);
     m.driveDb = baseDrive * td;
     m.ottDepth = std::min (0.8f, baseOtt * to);
-    m.autoGainDb += trimCorrectionDb (k, tw, baseDrive, m.driveDb, baseOtt, m.ottDepth);
+    m.autoGainDb += trimCorrectionDb (k, tw, baseVerb, m.reverbMix, baseDrive, m.driveDb, baseOtt, m.ottDepth);
     return m;
 }
 
@@ -119,6 +121,7 @@ void Engine::prepare (double sampleRate, int)
         lines[(size_t) i].setMax ((int) lineLen[(size_t) i] + ms (1.0) + 8);
     }
     verbHp.setHighPass (sr, 300.0);
+    satSplit.set (sr, 4000.0);
     xLow.set (sr, 120.0);
     xHigh.set (sr, 2500.0);
     apLow.set (sr, 2500.0);
@@ -140,7 +143,7 @@ void Engine::reset()
     pre.clear();
     for (auto& l : lines) l.clear();
     lineLp.fill (0.0f);
-    verbHp.reset(); xLow.reset(); xHigh.reset(); apLow.reset(); shelf.reset();
+    verbHp.reset(); satSplit.reset(); xLow.reset(); xHigh.reset(); apLow.reset(); shelf.reset();
     sideHp1.reset(); sideHp2.reset();
     env[0] = env[1] = env[2] = 0.0f;
     lfoChorus = lfoDbl = lfoVerb = beatPhase = 0.0;
@@ -208,7 +211,10 @@ void Engine::process (float* L, float* R, int n)
             const float dryL = L[i], dryR = R[i];
             float x[2] = { dryL, dryR };
 
-            // 1. saturation: first-order antiderivative anti-aliased tanh, normalised to unity small-signal gain
+            // 1. saturation: first-order antiderivative anti-aliased tanh, normalised to unity small-signal gain.
+            //    Only below 4 kHz (warmth), so the top end keeps its air for the sparkle stage.
+            float satHi[2] = { 0.0f, 0.0f };
+            for (int c = 0; c < 2; ++c) { float lo, hi; satSplit.split (x[c], c, lo, hi); x[c] = lo; satHi[c] = hi; }
             if (satWet > 0.0f)
                 for (int c = 0; c < 2; ++c)
                 {
@@ -219,6 +225,8 @@ void Engine::process (float* L, float* R, int n)
                     y = y / g - biasOut;
                     x[c] += satWet * (y - x[c]);
                 }
+            x[0] += satHi[0];
+            x[1] += satHi[1];
 
             // 2. chorus (0.4 Hz, 8 +- 3 ms, quadrature L/R)
             const float cS = (float) std::sin (lfoChorus), cC = (float) std::cos (lfoChorus);
@@ -271,8 +279,10 @@ void Engine::process (float* L, float* R, int n)
                 sum *= 2.0f / (float) N;
                 for (int k = 0; k < N; ++k)
                     lines[(size_t) k].push ((f[k] - sum) * lineGain[(size_t) k] + ((k & 1) ? -0.35f : 0.35f) * in);
-                const float wl = 0.5f * (f[0] - f[2] + f[4] - f[6]);
-                const float wr = 0.5f * (f[1] - f[3] + f[5] - f[7]);
+                // wet level calibrated so reverbMix is the hall's level relative to the dry signal (25 % ~ -12 dB, 40 % ~ -8 dB)
+                constexpr float kWet = 0.5f * 2.7f;
+                const float wl = kWet * (f[0] - f[2] + f[4] - f[6]);
+                const float wr = kWet * (f[1] - f[3] + f[5] - f[7]);
 
                 double phase;
                 if (hostPlaying) { const double p = hostPpq + (double) i * beatInc; phase = p - std::floor (p); }
