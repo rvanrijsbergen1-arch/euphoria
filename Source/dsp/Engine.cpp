@@ -46,8 +46,8 @@ float trimCorrectionDb (float k, float tw, float verb0, float verb1, float drive
     const float dW = tw - 1.0f, dD = drive1 - drive0, dO = ott1 - ott0;
     const float widthPresence = k < 0.3f ? k / 0.3f : 1.0f;
     const float verbDb = -10.0f * std::log10 ((1.0f + 1.2f * verb1 * verb1) / (1.0f + 1.2f * verb0 * verb0));   // hall energy
-    return -widthPresence * (dW < 0 ? 1.5f : 2.0f) * dW
-           + (dD < 0 ? 0.125f : 0.15f) * dD
+    return -widthPresence * (dW < 0 ? 1.5f : 0.3f) * dW
+           + (dD < 0 ? 0.125f : 0.27f) * dD
            + (dO < 0 ? 5.3f : 6.9f) * dO
            + verbDb;
 }
@@ -66,8 +66,8 @@ Mapping Mapping::forAmount (float k, bool bright, const Trims& t)
     m.shelfDb    = lerp ({ { 0.0f, 0.0f }, { 0.3f, bright ? 1.5f : 0.5f }, { 0.7f, bright ? 2.5f : 0.8f }, { 1.0f, bright ? 4.5f : 1.0f } }, k);
     m.doublerMix = lerp ({ { 0.0f, 0.0f }, { 0.7f, 0.0f }, { 1.0f, 0.30f } }, k);
     // measured with tests/PluginCheck.cpp (supersaw lead) so the level stays put over the whole knob range
-    m.autoGainDb = bright ? lerp ({ { 0.0f, 0.0f }, { 0.15f, -0.32f }, { 0.3f, -0.98f }, { 0.5f, -1.12f }, { 0.7f, -1.35f }, { 0.85f, -0.44f }, { 1.0f, 0.41f } }, k)
-                          : lerp ({ { 0.0f, 0.0f }, { 0.15f, 0.01f }, { 0.3f, -0.52f }, { 0.5f, -0.49f }, { 0.7f, -0.49f }, { 0.85f, 0.61f }, { 1.0f, 1.59f } }, k);
+    m.autoGainDb = bright ? lerp ({ { 0.0f, 0.0f }, { 0.15f, -0.31f }, { 0.3f, -0.85f }, { 0.5f, -0.92f }, { 0.7f, -1.09f }, { 0.85f, -0.14f }, { 1.0f, 0.8f } }, k)
+                          : lerp ({ { 0.0f, 0.0f }, { 0.15f, 0.02f }, { 0.3f, -0.4f }, { 0.5f, -0.3f }, { 0.7f, -0.24f }, { 0.85f, 0.88f }, { 1.0f, 1.88f } }, k);
     m.dampingHz  = bright ? 12000.0f : 5000.0f;
 
     // Spellbook trims (1 = default). Auto gain is calibrated for the default spell; the trims add a rough correction.
@@ -126,6 +126,7 @@ void Engine::prepare (double sampleRate, int)
     xHigh.set (sr, 2500.0);
     apLow.set (sr, 2500.0);
     sideHp1.setHighPass (sr, 150.0); sideHp2.setHighPass (sr, 150.0);
+    envSlow = (float) (1.0 - std::exp (-1.0 / (0.3 * sr)));
     ampCoef = (float) (1.0 - std::exp (-1.0 / (0.020 * sr)));
     wetCoef = (float) (1.0 - std::exp (-1.0 / (0.010 * sr)));
     duckCoef = (float) (1.0 - std::exp (-1.0 / (0.004 * sr)));
@@ -145,6 +146,7 @@ void Engine::reset()
     lineLp.fill (0.0f);
     verbHp.reset(); satSplit.reset(); xLow.reset(); xHigh.reset(); apLow.reset(); shelf.reset();
     sideHp1.reset(); sideHp2.reset();
+    midEnv = sideEnv = 0.0f; widthNow = 1.0f;
     env[0] = env[1] = env[2] = 0.0f;
     lfoChorus = lfoDbl = lfoVerb = beatPhase = 0.0;
     duckGain = 1.0f;
@@ -255,7 +257,14 @@ void Engine::process (float* L, float* R, int n)
                 const float mid = 0.5f * (x[0] + x[1]);
                 float side = 0.5f * (x[0] - x[1]);
                 const float sideHi = sideHp2.process (sideHp1.process (side, 0), 0);
-                side = (side + monoAmt * (sideHi - side)) * widthGain;
+                side = side + monoAmt * (sideHi - side);
+                // mono-safe width: widen only while the side stays below the mid (keeps L/R correlation >= 0)
+                midEnv += envSlow * (mid * mid - midEnv);
+                sideEnv += envSlow * (side * side - sideEnv);
+                const float room = std::sqrt ((midEnv + 1.0e-12f) / (sideEnv + 1.0e-12f));
+                const float target = std::max (1.0f, std::min (widthGain, room));
+                widthNow += envSlow * 8.0f * (target - widthNow);
+                side *= widthNow;
                 x[0] = mid + side;
                 x[1] = mid - side;
             }

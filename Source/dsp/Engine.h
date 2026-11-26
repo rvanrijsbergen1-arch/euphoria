@@ -142,6 +142,7 @@ private:
 
     // width
     Biquad sideHp1, sideHp2;
+    float midEnv = 0.0f, sideEnv = 0.0f, widthNow = 1.0f, envSlow = 0.0f;
 
     // reverb (8-line FDN)
     static constexpr int N = 8;
